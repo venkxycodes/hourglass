@@ -54,11 +54,7 @@ header {
   align-items: center;
   gap: 8px;
 }
-.brand-icon {
-  font-size: 34px;
-  font-weight: 400;
-  color: #426baf;
-}
+
 .brand-dot {
   color: #597fd5;
   margin-left: -8px;
@@ -114,11 +110,7 @@ p {
   color: #7a8596;
   margin: 13px 0 0;
 }
-.intro-mark {
-  font-size: 63px;
-  color: #c7d4e7;
-  padding-right: 18px;
-}
+
 .workspace {
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
@@ -142,10 +134,7 @@ h2 {
   letter-spacing: -0.5px;
   margin: 0;
 }
-.small-icon {
-  font-size: 22px;
-  color: #7087b1;
-}
+
 .muted {
   color: #7b8797;
   font-size: 12px;
@@ -245,19 +234,7 @@ h2 {
   width: 16px;
   height: 16px;
 }
-.aside-note {
-  display: flex;
-  gap: 12px;
-  margin: 24px 12px;
-  color: #94a1b5;
-}
-.aside-note > span {
-  font-size: 25px;
-}
-.aside-note p {
-  font-size: 12px;
-  margin: 0;
-}
+
 .tabs {
   display: flex;
   gap: 27px;
@@ -321,10 +298,7 @@ h2 {
   padding: 13px 15px;
   color: #65758d;
 }
-.scenario-summary > span {
-  font-size: 23px;
-  color: #6981a8;
-}
+
 .scenario-summary p {
   font-size: 12px;
   margin: 0;
@@ -415,10 +389,7 @@ h2 {
 .negative .net strong {
   color: #f1d1ac;
 }
-.chart-icon {
-  font-size: 32px;
-  color: #8b9fbf;
-}
+
 .threshold .muted {
   margin-bottom: 16px;
 }
@@ -542,9 +513,7 @@ h2 {
 .primary:hover {
   background: #34598f;
 }
-.primary span {
-  margin-left: 13px;
-}
+
 .notice {
   font-size: 12px;
   color: #607c99;
@@ -698,9 +667,7 @@ input::-webkit-inner-spin-button {
     font-size: 12px;
     max-width: 270px;
   }
-  .intro-mark {
-    display: none;
-  }
+
   .workspace {
     grid-template-columns: 1fr;
   }
@@ -714,9 +681,7 @@ input::-webkit-inner-spin-button {
     margin-top: 14px;
     padding: 15px 0;
   }
-  .aside-note {
-    display: none;
-  }
+
   .profile .input-note:last-child {
     margin-bottom: 0;
   }

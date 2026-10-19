@@ -120,7 +120,7 @@ function App() {
     <>
       <header>
         <a href="#" className="brand">
-          <span className="brand-icon">◷</span> hourglass
+          hourglass
           <span className="brand-dot">.</span>
         </a>
         <span className="header-note">
@@ -137,15 +137,11 @@ function App() {
             <h1>Make room for what matters.</h1>
             <p>Put a value on your time. Make the tradeoff with confidence.</p>
           </div>
-          <div className="intro-mark" aria-hidden="true">
-            ↗
-          </div>
         </div>
         <div className="workspace">
           <aside>
             <section className="profile">
               <div className="section-heading">
-                <span className="small-icon">◷</span>
                 <h2>Your time, valued</h2>
               </div>
               <p className="muted">Start with your working life.</p>
@@ -212,14 +208,6 @@ function App() {
                 Your free time can be worth more than your salary. You decide.
               </p>
             </section>
-            <div className="aside-note">
-              <span>✧</span>
-              <p>
-                Money comes back.
-                <br />
-                Your time is a little different.
-              </p>
-            </div>
           </aside>
           <div className="main-column">
             <nav className="tabs" aria-label="Workspace">
@@ -313,7 +301,7 @@ function App() {
                         setNotice("Accommodation example loaded.");
                       }}
                     >
-                      Load example ↺
+                      Load example
                     </button>
                   </div>
                   <label className="field">
@@ -336,7 +324,6 @@ function App() {
                     })}
                   </div>
                   <div className="scenario-summary">
-                    <span>⇄</span>
                     <p>
                       Spend <strong>{money(p.cost)}</strong> more to get{" "}
                       <strong>{p.saved} hours</strong> back over{" "}
@@ -404,7 +391,6 @@ function App() {
                         Your break-even point, at a glance.
                       </p>
                     </div>
-                    <span className="chart-icon">⌁</span>
                   </div>
                   {r.threshold === null ? (
                     <p>
@@ -480,7 +466,7 @@ function App() {
                   <div className="actions">
                     <span>Comfort, energy, and peace of mind count, too.</span>
                     <button className="primary" onClick={store}>
-                      Save comparison <span>＋</span>
+                      Save comparison
                     </button>
                   </div>
                 </section>
