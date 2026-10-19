@@ -63,20 +63,7 @@ header {
   font-size: 12px;
   color: #7b8799;
 }
-.local-badge {
-  margin-left: auto;
-  font-size: 12px;
-  color: #6b788a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.local-badge i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #61978c;
-}
+
 main {
   max-width: 1240px;
   margin: auto;
@@ -88,12 +75,7 @@ main {
   align-items: center;
   margin-bottom: 36px;
 }
-.eyebrow {
-  color: #617ba2;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
+
 h1 {
   font-family: Manrope, sans-serif;
   font-size: 38px;
@@ -671,9 +653,7 @@ input::-webkit-inner-spin-button {
   .header-note {
     display: none;
   }
-  .local-badge {
-    font-size: 10px;
-  }
+
   main {
     padding: 29px 18px;
   }

@@ -148,16 +148,12 @@ function App() {
         <span className="header-note">
           A little clarity for life's tradeoffs
         </span>
-        <span className="local-badge">
-          <i /> Private by design
-        </span>
       </header>
       <main>
         <div className="intro">
           <div>
-            <div className="eyebrow">Your time. Your call.</div>
-            <h1>Make room for what matters.</h1>
-            <p>Put a value on your time. Make the tradeoff with confidence.</p>
+            <h1>Make informed decisions</h1>
+            <p>Choose between time and money, backed by data.</p>
           </div>
         </div>
         <div className="workspace">
