@@ -767,3 +767,149 @@ input::-webkit-inner-spin-button {
   opacity: 0.5;
   cursor: not-allowed;
 }
+.example-buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 22px;
+}
+.example-buttons > span {
+  font-size: 11px;
+  color: #7b8797;
+}
+.period-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 12px;
+}
+.option-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+}
+.option-panel {
+  border: 1px solid #e1e7f0;
+  border-radius: 10px;
+  padding: 18px;
+  min-width: 0;
+}
+.option-panel h3 {
+  margin: 0 0 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #59759b;
+}
+.option-extras {
+  text-align: left;
+  max-width: none;
+  margin: 0 0 20px;
+}
+.option-extras summary {
+  font-size: 12px;
+  color: #59759b;
+  margin-bottom: 18px;
+}
+.option-extras .input-note {
+  margin-bottom: 0;
+}
+.option-totals {
+  border-top: 1px solid #e4eaf2;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.option-totals > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: #7b8797;
+}
+.option-totals strong {
+  font-weight: 600;
+  color: #344e71;
+  overflow-wrap: anywhere;
+}
+.period-note {
+  font-size: 10px;
+  color: #7b8797;
+  margin: 18px 0 0;
+}
+.comparison-results {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 22px;
+  margin-bottom: 22px;
+}
+.comparison-results > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.comparison-results span {
+  font-size: 11px;
+  color: #afc0d8;
+  overflow-wrap: anywhere;
+}
+.comparison-results strong {
+  font-family: Manrope, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.result-differences {
+  border-top: 1px solid #ffffff20;
+  padding: 12px 0 24px;
+}
+.result-differences p {
+  color: #b4c6de;
+  font-size: 12px;
+  margin: 0 0 10px;
+}
+.result-differences > strong {
+  color: #c4e0d8;
+  font-size: 14px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.saved-row > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.chart-labels > span {
+  max-width: 45%;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 950px) {
+  .option-grid {
+    grid-template-columns: 1fr;
+  }
+  .period-inputs {
+    grid-template-columns: 1fr 1fr;
+  }
+  .period-inputs > :last-child {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 680px) {
+  .comparison-results {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .example-buttons {
+    gap: 12px;
+  }
+  .example-buttons .text-button {
+    margin: 0;
+  }
+}
+
+.expense-summary {
+  font-size: 10px;
+  line-height: 1.6;
+  color: #71829a;
+  margin: 0 0 14px;
+}

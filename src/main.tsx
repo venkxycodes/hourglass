@@ -8,6 +8,8 @@ import {
   numericRules,
   type NumericKey,
   type Inputs,
+  type Frequency,
+  type PeriodUnit,
 } from "./calculations";
 import "./styles.css";
 function read<T>(key: string, fallback: T): T {
@@ -131,6 +133,46 @@ function App() {
     } catch {
       setNotice("Saved for this session. Browser storage is unavailable.");
     }
+  };
+  const optionName = (side: "a" | "b") =>
+    p[`${side}Name`].trim() || `Option ${side.toUpperCase()}`;
+  const faster = r.timeSaved >= 0 ? optionName("b") : optionName("a");
+  const cheaper = r.costDelta >= 0 ? optionName("a") : optionName("b");
+  const winnerName = r.winner ? optionName(r.winner) : "Both options";
+  const loadExample = (vehicle: boolean) => {
+    setDrafts({});
+    const next: Inputs = {
+      ...defaults,
+      salary: p.salary,
+      days: p.days,
+      hours: p.hours,
+      weeks: p.weeks,
+      currency: p.currency,
+      custom: p.custom,
+      value: p.value,
+    };
+    if (vehicle)
+      Object.assign(next, {
+        name: "Vehicle or walking",
+        aName: "Walk",
+        bName: "Buy a vehicle",
+        aMinutes: 40,
+        bMinutes: 10,
+        bCost: 90000,
+        bRecurring: 2000,
+        bFrequency: "month",
+        bResale: 40000,
+        duration: 3,
+        periodUnit: "year",
+        totalUses: 1500,
+      });
+    setP(next);
+    try {
+      localStorage.setItem("hourglass-inputs", JSON.stringify(next));
+    } catch {}
+    setNotice(
+      `${vehicle ? "Vehicle" : "Accommodation"} example loaded. Replace the illustrative amounts with your estimates.`,
+    );
   };
   const maxRate = Math.max(
     r.hourly * 2,
@@ -259,8 +301,8 @@ function App() {
                       <div>
                         <strong>{s.name}</strong>
                         <p>
-                          {s.currency} {s.cost.toLocaleString()} extra ·{" "}
-                          {s.saved} hours saved
+                          {s.aName} vs {s.bName} · {s.duration} {s.periodUnit}
+                          {s.duration === 1 ? "" : "s"}
                         </p>
                       </div>
                       <button
@@ -304,101 +346,195 @@ function App() {
                 <section className="card scenario">
                   <div className="card-title">
                     <div>
-                      <h2>What are you weighing up?</h2>
+                      <h2>Compare your options</h2>
                       <p className="muted">
-                        Compare spending a little more with getting time back.
+                        Account for the money and time required on both sides.
                       </p>
                     </div>
+                  </div>
+                  <div className="example-buttons">
+                    <span>Try an example</span>
                     <button
                       className="text-button"
-                      onClick={() => {
-                        setDrafts({});
-                        setP({
-                          ...p,
-                          name: defaults.name,
-                          cost: 11000,
-                          duration: 6,
-                          saved: 12,
-                        });
-                        setNotice("Accommodation example loaded.");
-                      }}
+                      onClick={() => loadExample(false)}
                     >
-                      Load example
+                      Accommodation
+                    </button>
+                    <button
+                      className="text-button"
+                      onClick={() => loadExample(true)}
+                    >
+                      Vehicle vs walking
                     </button>
                   </div>
                   <label className="field">
-                    <span>Give your decision a name</span>
+                    <span>Decision name</span>
                     <input
                       value={p.name}
                       maxLength={100}
                       onChange={(e) => update("name", e.target.value)}
-                      placeholder="e.g. Stay closer to work"
                     />
                   </label>
-                  <div className="scenario-inputs">
-                    {field("Extra cost for the whole stay", "cost", {
-                      suffix: p.currency,
-                    })}
-                    {field("Total time saved", "saved", { suffix: "hours" })}
-                    {field("Over how many days?", "duration", {
-                      min: 1,
-                      step: 1,
-                    })}
+                  <div className="period-inputs">
+                    {field("Evaluation period", "duration")}
+                    <label className="field">
+                      <span>Period unit</span>
+                      <select
+                        value={p.periodUnit}
+                        onChange={(e) =>
+                          update("periodUnit", e.target.value as PeriodUnit)
+                        }
+                      >
+                        <option value="day">Days</option>
+                        <option value="month">Months</option>
+                        <option value="year">Years</option>
+                      </select>
+                    </label>
+                    {field("Total uses over this period", "totalUses")}
                   </div>
-                  <div className="scenario-summary">
-                    <p>
-                      Spend <strong>{money(p.cost)}</strong> more to get{" "}
-                      <strong>{p.saved} hours</strong> back over{" "}
-                      <strong>{p.duration} days</strong>.<br />
-                      <span>
-                        That's {(p.saved / p.duration).toFixed(1)} hours saved
-                        per day. Include both commute directions.
-                      </span>
-                    </p>
+                  <p className="input-note">
+                    Count one-way trips separately. For example, 2 trips a day
+                    for 6 days = 12 uses. Both options use this same count.
+                  </p>
+                  <div className="option-grid">
+                    {(["a", "b"] as const).map((side) => (
+                      <section
+                        className="option-panel"
+                        key={side}
+                        aria-label={`Option ${side.toUpperCase()}`}
+                      >
+                        <h3>Option {side.toUpperCase()}</h3>
+                        <label className="field">
+                          <span>Option {side.toUpperCase()} name</span>
+                          <input
+                            value={p[`${side}Name`]}
+                            maxLength={100}
+                            onChange={(e) =>
+                              update(`${side}Name`, e.target.value)
+                            }
+                          />
+                        </label>
+                        {field("One-time cost", `${side}Cost`, {
+                          suffix: p.currency,
+                        })}
+                        {field("Time per use", `${side}Minutes`, {
+                          suffix: "min",
+                        })}
+                        <details className="option-extras">
+                          <summary>Recurring costs & resale</summary>
+                          {field("Recurring expenses", `${side}Recurring`, {
+                            suffix: p.currency,
+                          })}
+                          <label className="field">
+                            <span>Expense frequency</span>
+                            <select
+                              value={p[`${side}Frequency`]}
+                              onChange={(e) =>
+                                update(
+                                  `${side}Frequency`,
+                                  e.target.value as Frequency,
+                                )
+                              }
+                            >
+                              <option value="use">Per use</option>
+                              <option value="day">Per day</option>
+                              <option value="week">Per week</option>
+                              <option value="month">Per month</option>
+                              <option value="year">Per year</option>
+                            </select>
+                          </label>
+                          {field(
+                            "Resale value at end of period",
+                            `${side}Resale`,
+                            { suffix: p.currency },
+                          )}
+                          <p className="input-note">
+                            Combine expenses with the same frequency, or convert
+                            them to one frequency first. Resale value reduces
+                            total cost.
+                          </p>
+                        </details>
+                        {(p[`${side}Recurring`] > 0 ||
+                          p[`${side}Resale`] > 0) && (
+                          <p className="expense-summary">
+                            Includes {money(p[`${side}Recurring`])} per{" "}
+                            {p[`${side}Frequency`]} in expenses;{" "}
+                            {money(p[`${side}Resale`])} resale value deducted.
+                          </p>
+                        )}
+                        <div className="option-totals">
+                          <span>
+                            Total cost{" "}
+                            <strong>
+                              {money(side === "a" ? r.aCost : r.bCost)}
+                            </strong>
+                          </span>
+                          <span>
+                            Total time{" "}
+                            <strong>
+                              {(side === "a"
+                                ? r.aHours
+                                : r.bHours
+                              ).toLocaleString(undefined, {
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              hr
+                            </strong>
+                          </span>
+                        </div>
+                      </section>
+                    ))}
                   </div>
+                  <p className="period-note">
+                    Recurring costs are prorated over the full period. A year is
+                    365 days; a month is 1/12 of a year. Estimates exclude
+                    financing, inflation, and the timing of payments.
+                  </p>
                 </section>
-                <section className={`result ${r.net < 0 ? "negative" : ""}`}>
+                <section className="result">
                   <div className="result-heading">
                     <span className="result-tag">
-                      {r.net > 0
-                        ? "Time well bought"
-                        : r.net < 0
-                          ? "Keep the savings"
+                      {r.dominant
+                        ? "Lower cost and time"
+                        : r.winner
+                          ? "Estimated best value"
                           : "An even trade"}
                     </span>
                     <span>At {money(r.rate, true)} / hr</span>
                   </div>
                   <h2>
-                    {r.net > 0
-                      ? "The extra spend is worth your time."
-                      : r.net < 0
-                        ? "The savings are worth the extra time."
-                        : "Both options balance out."}
+                    {r.winner
+                      ? `${winnerName} offers better overall value.`
+                      : "Both options balance out."}
                   </h2>
                   <p>
-                    {r.net > 0
-                      ? "The value of the time you get back exceeds the extra cost."
-                      : r.net < 0
-                        ? "At your current time value, the extra cost exceeds the time saved."
-                        : "The time saved has the same estimated value as the extra cost."}
+                    {r.dominant
+                      ? `${optionName(r.dominant)} costs no more and takes no longer over this period; at least one is lower.`
+                      : "Total cost plus the value of time spent determines the result."}
                   </p>
-                  <div className="result-math">
+                  <div className="comparison-results">
                     <div>
-                      <span>Value of {p.saved} hours saved</span>
-                      <strong>{money(r.timeValue)}</strong>
+                      <span>{optionName("a")} · cost + time value</span>
+                      <strong>{money(r.aCost + r.aHours * r.rate)}</strong>
                     </div>
-                    <b>−</b>
                     <div>
-                      <span>Extra cost</span>
-                      <strong>{money(p.cost)}</strong>
+                      <span>{optionName("b")} · cost + time value</span>
+                      <strong>{money(r.bCost + r.bHours * r.rate)}</strong>
                     </div>
-                    <b>=</b>
-                    <div className="net">
-                      <span>
-                        Estimated net {r.net < 0 ? "cost" : "benefit"}
-                      </span>
-                      <strong>{money(Math.abs(r.net))}</strong>
-                    </div>
+                  </div>
+                  <div className="result-differences">
+                    <p>
+                      {Math.abs(r.timeSaved) < 0.000001
+                        ? "Both take the same time."
+                        : `${faster} saves ${Math.abs(r.timeSaved).toLocaleString(undefined, { maximumFractionDigits: 2 })} hours.`}{" "}
+                      {Math.abs(r.costDelta) < 0.000001
+                        ? "Both cost the same."
+                        : `${cheaper} costs ${money(Math.abs(r.costDelta))} less.`}
+                    </p>
+                    <strong>
+                      {money(Math.abs(r.net))} estimated net benefit
+                      {r.winner ? ` with ${winnerName}` : ""}
+                    </strong>
                   </div>
                   <div className="result-foot">
                     An estimate of value, not cash profit. Saved time earns
@@ -416,13 +552,20 @@ function App() {
                   </div>
                   {r.threshold === null ? (
                     <p>
-                      No time is saved. Add saved hours to calculate a
-                      break-even point.
+                      {r.timeSaved === 0
+                        ? "Both options take the same time. Compare their total costs."
+                        : `${faster} is also no more expensive. There is no positive hourly break-even point.`}
                     </p>
                   ) : (
                     <>
                       <div className="threshold-copy">
-                        The extra spend pays off when your time is worth{" "}
+                        {faster} costs {money(Math.abs(r.costDelta))} more and
+                        saves{" "}
+                        {Math.abs(r.timeSaved).toLocaleString(undefined, {
+                          maximumFractionDigits: 2,
+                        })}{" "}
+                        hours. It becomes worth the extra spend when your time
+                        is valued at{" "}
                         <strong>{money(r.threshold, true)}/hr</strong> or more.
                       </div>
                       <div
@@ -453,8 +596,8 @@ function App() {
                         </div>
                       </div>
                       <div className="chart-labels">
-                        <span>Keep the savings</span>
-                        <span>Buy back your time</span>
+                        <span>{cheaper}</span>
+                        <span>{faster}</span>
                       </div>
                       <label className="slider-label" htmlFor="time-slider">
                         Explore your hourly time value{" "}
@@ -516,10 +659,12 @@ function App() {
             <summary>How the math works</summary>
             <p>
               Hourly rate = annual compensation ÷ (workdays × hours per day ×
-              working weeks). Net benefit = hours saved × hourly time value −
-              extra cost. Break-even = extra cost ÷ hours saved. Currency
-              selection changes the denomination; it does not convert amounts.
-              All data stays in this browser.
+              working weeks). Total cost = one-time cost + recurring expenses −
+              resale value. Total time = minutes per use × total uses ÷ 60.
+              Choose the lower total of cost + time × hourly value. Break-even =
+              extra cost ÷ hours saved, when the faster option costs more.
+              Currency selection changes the denomination; it does not convert
+              amounts. All data stays in this browser.
             </p>
           </details>
         </footer>

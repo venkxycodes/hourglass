@@ -30,8 +30,16 @@ Keep responsive layouts, keyboard access, visible focus, and reduced-motion supp
 - Annual hours = workdays per week × hours per day × working weeks per year.
 - Baseline hourly rate = annual compensation ÷ annual hours.
 - Use the personal hourly value when the override is enabled.
-- Net benefit = total saved hours × hourly value − total extra cost.
-- Break-even hourly value = extra cost ÷ saved hours; no saved hours means no threshold.
+- Each option has one-time cost, recurring expenses with a frequency, end-of-period resale value, and minutes per use.
+- The comparison shares a duration (days/months/years) and total use count.
+- Total cost = one-time cost + prorated recurring expenses − resale value.
+- Total hours = minutes per use × total uses ÷ 60.
+- Choose the lower total cost + total hours × hourly value.
+- Signed net benefit for B = (A hours − B hours) × hourly value − (B cost − A cost).
+- Break-even = extra cost ÷ hours saved only when the faster option costs more.
+- Handle equal times/costs, ties, reversed option order, and cheaper/faster dominance.
+- Prorate using 365 days per year and 365/12 days per month; explain this assumption.
+- Preserve existing saved comparisons by migrating legacy extra-cost/time-saved inputs.
 - Explain estimated time value separately from cash profit.
 - Currency selection changes formatting and denomination, not numeric conversion.
 
