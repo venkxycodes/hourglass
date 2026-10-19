@@ -556,6 +556,26 @@ h2 {
   padding: 8px 12px;
   color: #456a9e;
 }
+.saved-row .saved-open {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid #d3deed;
+  border-radius: 7px;
+  background: #fff;
+  color: #345887;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background-color 150ms, border-color 150ms;
+}
+.saved-row .saved-open:hover {
+  background: #f0f4fa;
+  border-color: #9eb5d4;
+}
+.saved-row .saved-open:active {
+  background: #e5edf8;
+}
 footer {
   border-top: 1px solid #e0e6ee;
   margin-top: 28px;

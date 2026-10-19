@@ -246,6 +246,8 @@ function App() {
                         </p>
                       </div>
                       <button
+                        className="saved-open"
+                        aria-label={`Open ${s.name}`}
                         onClick={() => {
                           setP(s);
                           setTab("compare");
