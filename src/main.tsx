@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { calculate, defaults, type Inputs } from "./calculations";
+import {
+  calculate,
+  defaults,
+  sanitizeInputs,
+  validateNumber,
+  numericRules,
+  type NumericKey,
+  type Inputs,
+} from "./calculations";
 import "./styles.css";
 function read<T>(key: string, fallback: T): T {
   try {
@@ -24,21 +32,23 @@ const currencyCodes = (
   "SGD",
 ];
 function App() {
-  const [p, setP] = useState<Inputs>(() => {
-    const raw = read<Inputs>("hourglass-inputs", defaults);
-    return {
-      ...defaults,
-      ...Object.fromEntries(
-        Object.entries(raw).filter(
-          ([key, v]) =>
-            typeof v === typeof defaults[key as keyof Inputs] &&
-            (typeof v !== "number" || (Number.isFinite(v) && v >= 0)),
-        ),
-      ),
-    } as Inputs;
+  const [p, setP] = useState<Inputs>(() =>
+    sanitizeInputs(read<unknown>("hourglass-inputs", defaults)),
+  );
+  const [saved, setSaved] = useState<Inputs[]>(() => {
+    const raw = read<unknown>("hourglass-saved", []);
+    return Array.isArray(raw)
+      ? raw
+          .filter((v) => v && typeof v === "object" && !Array.isArray(v))
+          .slice(0, 12)
+          .map(sanitizeInputs)
+      : [];
   });
-  const [saved, setSaved] = useState<Inputs[]>(() =>
-    read<Inputs[]>("hourglass-saved", []),
+  const [drafts, setDrafts] = useState<Partial<Record<NumericKey, string>>>({});
+  const hasInvalid = Object.entries(drafts).some(
+    ([key, value]) =>
+      (key !== "value" || p.custom) &&
+      validateNumber(key as NumericKey, value!) !== null,
   );
   const [notice, setNotice] = useState("");
   const [tab, setTab] = useState("compare");
@@ -67,40 +77,52 @@ function App() {
   };
   const field = (
     label: string,
-    key: keyof Inputs,
+    key: NumericKey,
     options: {
       suffix?: string;
       min?: number;
       max?: number;
       step?: number;
     } = {},
-  ) => (
-    <label className="field">
-      <span>{label}</span>
-      <div className="input-wrap">
-        <input
-          type="number"
-          min={options.min ?? 0}
-          max={options.max}
-          step={options.step ?? "any"}
-          value={p[key] as number}
-          onChange={(e) => {
-            const n = Number(e.target.value);
-            if (Number.isFinite(n))
-              update(
-                key,
-                Math.max(
-                  options.min ?? 0,
-                  Math.min(options.max ?? Number.MAX_SAFE_INTEGER, n),
-                ) as never,
-              );
-          }}
-        />
-        {options.suffix && <span>{options.suffix}</span>}
-      </div>
-    </label>
-  );
+  ) => {
+    const raw = drafts[key] ?? String(p[key]);
+    const error = validateNumber(key, raw);
+    return (
+      <label className="field">
+        <span>{label}</span>
+        <div className="input-wrap">
+          <input
+            type="text"
+            inputMode={numericRules[key].step === 1 ? "numeric" : "decimal"}
+            value={raw}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${key}-error` : undefined}
+            onChange={(e) => {
+              const value = e.target.value;
+              setDrafts((previous) => ({ ...previous, [key]: value }));
+              if (validateNumber(key, value) === null)
+                update(key, Number(value));
+            }}
+            onBlur={() => {
+              setDrafts((previous) => {
+                const next = { ...previous };
+                delete next[key];
+                return next;
+              });
+            }}
+          />
+          {options.suffix && <span>{options.suffix}</span>}
+        </div>
+        {error && (
+          <span className="field-error" id={`${key}-error`}>
+            {error} The last valid value is used.
+          </span>
+        )}
+      </label>
+    );
+  };
   const store = () => {
+    if (hasInvalid) return;
     const next = [{ ...p }, ...saved].slice(0, 12);
     setSaved(next);
     try {
@@ -249,6 +271,7 @@ function App() {
                         className="saved-open"
                         aria-label={`Open ${s.name}`}
                         onClick={() => {
+                          setDrafts({});
                           setP(s);
                           setTab("compare");
                           try {
@@ -293,6 +316,7 @@ function App() {
                     <button
                       className="text-button"
                       onClick={() => {
+                        setDrafts({});
                         setP({
                           ...p,
                           name: defaults.name,
@@ -454,6 +478,11 @@ function App() {
                             custom: true,
                             value: Number(e.target.value),
                           };
+                          setDrafts((previous) => {
+                            const next = { ...previous };
+                            delete next.value;
+                            return next;
+                          });
                           setP(next);
                           try {
                             localStorage.setItem(
@@ -467,7 +496,11 @@ function App() {
                   )}
                   <div className="actions">
                     <span>Comfort, energy, and peace of mind count, too.</span>
-                    <button className="primary" onClick={store}>
+                    <button
+                      className="primary"
+                      disabled={hasInvalid}
+                      onClick={store}
+                    >
                       Save comparison
                     </button>
                   </div>

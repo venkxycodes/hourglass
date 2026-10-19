@@ -20,3 +20,11 @@ See [AGENTS.md](AGENTS.md). Repo-local skills are in [.agents/skills](.agents/sk
 
 The interface uses a restrained navy and blue palette. Decorative arrows and
 ornaments are intentionally omitted; calculation and chart symbols convey meaning.
+
+Numeric fields support direct typing. Workdays are whole numbers from 1–7;
+hours per day use half-hour increments from 0.5–24; working weeks are whole
+numbers from 1–52. Comparison duration uses whole positive days. Costs, income,
+and saved hours cannot be negative. Invalid drafts show an inline error and
+keep the last valid calculation; leaving the field restores its valid value.
+Saving is disabled while an active numeric field is invalid. Stored numeric
+values are checked against the same rules when loaded.
